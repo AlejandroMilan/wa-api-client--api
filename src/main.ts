@@ -12,6 +12,7 @@ async function bootstrap() {
     .setDescription('API for managing WhatsApp conversations and messages')
     .setVersion('1.0')
     .addTag('wa-conversations', 'WhatsApp Conversations management')
+    .addTag('wa-messages', 'WhatsApp Messages management')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
