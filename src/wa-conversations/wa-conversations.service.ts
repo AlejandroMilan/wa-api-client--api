@@ -15,4 +15,14 @@ export class WaConversationsService {
   ): Promise<IWaConversation> {
     return await this.waConversationRepository.save(payload);
   }
+
+  async getConversationById(id: string): Promise<IWaConversation | null> {
+    return await this.waConversationRepository.findByID(id);
+  }
+
+  async getConversationByPhoneNumber(
+    phoneNumber: string,
+  ): Promise<IWaConversation | null> {
+    return await this.waConversationRepository.findByPhoneNumber(phoneNumber);
+  }
 }

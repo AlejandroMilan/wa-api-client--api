@@ -16,5 +16,6 @@ import { WaConversationMongoRepoProvider } from './mongo/wa-conversation.mongoRe
   ],
   providers: [WaConversationsService, WaConversationMongoRepoProvider],
   controllers: [WaConversationsController],
+  exports: [WaConversationsService, WaConversationMongoRepoProvider],
 })
 export class WaConversationsModule {}

@@ -22,4 +22,18 @@ export class WaConversationMongoRepository
     await createdConversation.save();
     return createdConversation.toObject<IWaConversation>();
   }
+
+  async findByID(id: string): Promise<IWaConversation | null> {
+    return await this.waConversationModel
+      .findById(id)
+      .lean<IWaConversation | null>();
+  }
+
+  async findByPhoneNumber(
+    phoneNumber: string,
+  ): Promise<IWaConversation | null> {
+    return await this.waConversationModel
+      .findOne({ phoneNumber })
+      .lean<IWaConversation | null>();
+  }
 }

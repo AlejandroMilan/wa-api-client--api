@@ -13,7 +13,7 @@ export class WaConversation implements IWaConversation {
   })
   status: WaConversationStatus;
 
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true })
   phoneNumber: string;
 
   @Prop({ required: true })

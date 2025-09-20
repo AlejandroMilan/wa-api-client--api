@@ -14,9 +14,13 @@ export interface IWaMessage {
   direction: WaMessageDirection;
   conversation: string;
   timestamp: Date;
-  text: string;
+  text?: string;
   template?: {
     templateName: string;
-    templateParams: Record<string, any>;
+    params: {
+      body: Record<string, any>;
+      header?: Record<string, any>;
+      buttons?: Record<string, any>;
+    };
   };
 }
