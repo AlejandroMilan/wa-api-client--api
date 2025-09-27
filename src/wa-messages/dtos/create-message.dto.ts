@@ -26,19 +26,36 @@ export class CreateMessageDto implements Partial<IWaMessage> {
   direction: WaMessageDirection;
 
   @ApiProperty({
-    description: 'ID of the conversation this message belongs to',
-    example: '507f1f77bcf86cd799439011',
-  })
-  @IsString()
-  @IsNotEmpty()
-  conversation: string;
-
-  @ApiProperty({
     description: 'Text content of the message',
     example: 'Hello, how can I help you?',
   })
   @IsString()
   text: string;
+
+  @ApiPropertyOptional({
+    description: 'ID of the conversation this message belongs to',
+    example: '507f1f77bcf86cd799439011',
+  })
+  @IsString()
+  conversation?: string;
+
+  @IsString()
+  @ApiPropertyOptional({
+    description:
+      'Sender of the message. Required if there is no conversation ID',
+    example: '+1234567890',
+    type: String,
+  })
+  from?: string;
+
+  @IsString()
+  @ApiPropertyOptional({
+    description:
+      'Recipient of the message. Required if there is no conversation ID',
+    example: '+0987654321',
+    type: String,
+  })
+  to?: string;
 
   @ApiPropertyOptional({
     description: 'Template configuration for template messages',

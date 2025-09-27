@@ -1,8 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { IWaMessageRepository } from './wa-message.repository.interface';
 import { CreateMessageDto } from './dtos/create-message.dto';
-import { WaMessageType } from './types/wa-message.interface';
+import {
+  WaMessageDirection,
+  WaMessageType,
+} from './types/wa-message.interface';
 import { WaConversationsService } from 'src/wa-conversations/wa-conversations.service';
+import { IWaConversation } from 'src/wa-conversations/types/wa-conversation.interface';
 
 @Injectable()
 export class WaMessagesService {
@@ -20,13 +24,41 @@ export class WaMessagesService {
       throw new Error('Text content must be provided for text messages.');
     }
 
-    const conversation = await this.waConversationsService.getConversationById(
-      message.conversation,
-    );
-    if (!conversation) {
-      throw new Error('Conversation not found.');
+    let conversation: IWaConversation | null = null;
+
+    if (message.conversation) {
+      conversation = await this.waConversationsService.getConversationById(
+        message.conversation,
+      );
+      if (!conversation)
+        throw new Error('Conversation with the provided ID does not exist.');
+    } else {
+      const phoneNumber =
+        message.direction === WaMessageDirection.OUTGOING
+          ? message.to
+          : message.from;
+      if (!phoneNumber) {
+        throw new Error(
+          'Phone number could not be determined from the message direction and from/to fields.',
+        );
+      }
+      if (!conversation)
+        conversation =
+          await this.waConversationsService.getConversationByPhoneNumber(
+            phoneNumber,
+          );
+      if (!conversation)
+        conversation = await this.waConversationsService.createConversation({
+          phoneNumber,
+          contactName: phoneNumber,
+        });
+
+      message.conversation = conversation._id!.toString();
     }
 
-    return await this.waMessageRepository.save(message);
+    return await this.waMessageRepository.save({
+      ...message,
+      timestamp: new Date(),
+    });
   }
 }
