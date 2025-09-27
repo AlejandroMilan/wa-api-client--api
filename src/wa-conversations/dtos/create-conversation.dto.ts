@@ -1,6 +1,9 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import type { IWaConversation } from '../types/wa-conversation.interface';
+import type {
+  IWaConversation,
+  WaConversationStatus,
+} from '../types/wa-conversation.interface';
 
 export class CreateConversationDto implements Partial<IWaConversation> {
   @ApiProperty({
@@ -20,4 +23,7 @@ export class CreateConversationDto implements Partial<IWaConversation> {
   @IsString()
   @IsNotEmpty()
   contactName: string;
+
+  @IsString()
+  status?: WaConversationStatus | undefined;
 }

@@ -9,7 +9,7 @@ export class WaConversation implements IWaConversation {
   @Prop({
     required: true,
     enum: Object.values(WaConversationStatus),
-    default: WaConversationStatus.ACTIVE,
+    default: WaConversationStatus.WAITING_RESPONSE,
   })
   status: WaConversationStatus;
 

@@ -6,7 +6,10 @@ import {
   WaMessageType,
 } from './types/wa-message.interface';
 import { WaConversationsService } from 'src/wa-conversations/wa-conversations.service';
-import { IWaConversation } from 'src/wa-conversations/types/wa-conversation.interface';
+import {
+  IWaConversation,
+  WaConversationStatus,
+} from 'src/wa-conversations/types/wa-conversation.interface';
 
 @Injectable()
 export class WaMessagesService {
@@ -51,6 +54,10 @@ export class WaMessagesService {
         conversation = await this.waConversationsService.createConversation({
           phoneNumber,
           contactName: phoneNumber,
+          status:
+            message.direction === WaMessageDirection.INCOMING
+              ? WaConversationStatus.ACTIVE
+              : WaConversationStatus.WAITING_RESPONSE,
         });
 
       message.conversation = conversation._id!.toString();
