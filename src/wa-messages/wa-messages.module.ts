@@ -20,5 +20,6 @@ import { WaMessage, WaMessageSchema } from './mongo/wa-message.schema';
     WaMessageMongoRepoProvider,
     WaConversationsService,
   ],
+  exports: [WaMessagesService, WaMessageMongoRepoProvider],
 })
 export class WaMessagesModule {}

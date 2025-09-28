@@ -68,4 +68,10 @@ export class WaMessagesService {
       timestamp: new Date(),
     });
   }
+
+  async getLastMessageByConversationId(conversationId: string) {
+    return await this.waMessageRepository.findLastByConversationId(
+      conversationId,
+    );
+  }
 }

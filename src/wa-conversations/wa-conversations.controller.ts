@@ -1,13 +1,17 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Res } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiBody,
   ApiCreatedResponse,
+  ApiOkResponse,
   ApiInternalServerErrorResponse,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { WaConversationsService } from './wa-conversations.service';
 import { CreateConversationDto } from './dtos/create-conversation.dto';
+import { ListConversationsDto } from './dtos/list-conversations.dto';
+import { ListConversationsResponseDto } from './dtos/conversation-with-last-message.dto';
 import type { Response } from 'express';
 
 @ApiTags('wa-conversations')
@@ -76,6 +80,52 @@ export class WaConversationsController {
       return res.status(201).json(conversation);
     } catch (error) {
       console.error('Error creating conversation:', error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+  }
+
+  @Get()
+  @ApiOperation({
+    summary: 'List WhatsApp conversations',
+    description:
+      'Get a paginated list of WhatsApp conversations with their last messages. Conversations are sorted by last activity in descending order.',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number (1-based)',
+    example: 1,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Number of conversations per page (max 100)',
+    example: 10,
+  })
+  @ApiOkResponse({
+    description: 'List of conversations retrieved successfully',
+    type: ListConversationsResponseDto,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal server error',
+    schema: {
+      type: 'object',
+      properties: {
+        error: { type: 'string', example: 'Internal Server Error' },
+      },
+    },
+  })
+  async listConversations(
+    @Res() res: Response,
+    @Query() query: ListConversationsDto,
+  ) {
+    try {
+      const result = await this.waConversationsService.listConversations(query);
+      return res.status(200).json(result);
+    } catch (error) {
+      console.error('Error listing conversations:', error);
       return res.status(500).json({ error: 'Internal Server Error' });
     }
   }
