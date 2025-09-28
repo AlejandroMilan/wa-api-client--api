@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { WaMessage, WaMessageDocument } from './wa-message.schema';
 import { Model } from 'mongoose';
-import type { IWaMessageRepository } from '../wa-message.repository.interface';
+import {
+  type IWaMessageRepository,
+  type PaginatedMessages,
+} from '../wa-message.repository.interface';
 import type { IWaMessage } from '../types/wa-message.interface';
 
 @Injectable()
@@ -25,5 +28,28 @@ export class WaMessageMongoRepository implements IWaMessageRepository {
       .findOne({ conversation: conversationId })
       .sort({ timestamp: -1 })
       .lean<IWaMessage | null>();
+  }
+
+  async findPaginatedByConversationId(
+    conversationId: string,
+    page: number,
+    limit: number,
+  ): Promise<PaginatedMessages> {
+    const skip = (page - 1) * limit;
+
+    const [messages, total] = await Promise.all([
+      this.waMessageModel
+        .find({ conversation: conversationId })
+        .sort({ timestamp: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean<IWaMessage[]>(),
+      this.waMessageModel.countDocuments({ conversation: conversationId }),
+    ]);
+
+    return {
+      messages,
+      total,
+    };
   }
 }

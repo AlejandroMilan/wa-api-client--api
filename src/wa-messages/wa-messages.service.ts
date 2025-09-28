@@ -74,4 +74,31 @@ export class WaMessagesService {
       conversationId,
     );
   }
+
+  async listMessagesByConversationId(
+    conversationId: string,
+    page: number = 1,
+    limit: number = 10,
+  ) {
+    const { messages, total } =
+      await this.waMessageRepository.findPaginatedByConversationId(
+        conversationId,
+        page,
+        limit,
+      );
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      messages,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      },
+    };
+  }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Res } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -8,9 +8,12 @@ import {
   ApiNotFoundResponse,
   ApiInternalServerErrorResponse,
   ApiParam,
+  ApiQuery,
 } from '@nestjs/swagger';
 import type { Response } from 'express';
 import { CreateMessageDto } from './dtos/create-message.dto';
+import { ListMessagesDto } from './dtos/list-messages.dto';
+import { ListMessagesResponseDto } from './dtos/list-messages-response.dto';
 import { WaMessagesService } from './wa-messages.service';
 
 @ApiTags('wa-messages')
@@ -178,10 +181,88 @@ export class WaMessagesController {
           .status(404)
           .json({ message: 'No messages found for this conversation' });
       }
-      
+
       return res.status(200).json(lastMessage);
     } catch (error) {
       console.error('Error getting last message:', error);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+
+  @Get('conversation/:conversationId')
+  @ApiOperation({
+    summary: 'List messages for a conversation',
+    description:
+      'Get a paginated list of messages for a specific conversation. Messages are sorted from newest to oldest.',
+  })
+  @ApiParam({
+    name: 'conversationId',
+    description: 'ID of the conversation',
+    example: '507f1f77bcf86cd799439011',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number (1-based)',
+    example: 1,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Number of messages per page (max 100)',
+    example: 10,
+  })
+  @ApiOkResponse({
+    description: 'Messages retrieved successfully',
+    type: ListMessagesResponseDto,
+  })
+  @ApiNotFoundResponse({
+    description: 'Conversation not found or no messages',
+    schema: {
+      type: 'object',
+      properties: {
+        message: {
+          type: 'string',
+          example: 'No messages found for this conversation',
+        },
+      },
+    },
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal server error',
+    schema: {
+      type: 'object',
+      properties: {
+        message: { type: 'string', example: 'Internal server error' },
+      },
+    },
+  })
+  async listMessages(
+    @Res() res: Response,
+    @Param('conversationId') conversationId: string,
+    @Query() query: ListMessagesDto,
+  ) {
+    try {
+      const page = query.page ?? 1;
+      const limit = query.limit ?? 10;
+
+      const result = await this.waMessagesService.listMessagesByConversationId(
+        conversationId,
+        page,
+        limit,
+      );
+
+      if (result.messages.length === 0 && page === 1) {
+        return res.status(404).json({
+          message: 'No messages found for this conversation',
+        });
+      }
+
+      return res.status(200).json(result);
+    } catch (error) {
+      console.error('Error listing messages:', error);
       return res.status(500).json({ message: 'Internal server error' });
     }
   }
