@@ -61,4 +61,21 @@ export class WaConversationMongoRepository
       total,
     };
   }
+
+  async incrementUnreadCount(conversationId: string): Promise<void> {
+    await this.waConversationModel.updateOne(
+      { _id: conversationId },
+      {
+        $inc: { unreadCount: 1 },
+        $set: { lastActivity: new Date() },
+      },
+    );
+  }
+
+  async resetUnreadCount(conversationId: string): Promise<void> {
+    await this.waConversationModel.updateOne(
+      { _id: conversationId },
+      { $set: { unreadCount: 0 } },
+    );
+  }
 }

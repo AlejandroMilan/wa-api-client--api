@@ -52,4 +52,11 @@ export class WaMessageMongoRepository implements IWaMessageRepository {
       total,
     };
   }
+
+  async markAllAsReadByConversationId(conversationId: string): Promise<void> {
+    await this.waMessageModel.updateMany(
+      { conversation: conversationId, readed: false },
+      { $set: { readed: true } },
+    );
+  }
 }

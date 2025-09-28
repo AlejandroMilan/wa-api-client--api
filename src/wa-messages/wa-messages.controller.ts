@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Query, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  Res,
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -263,6 +272,59 @@ export class WaMessagesController {
       return res.status(200).json(result);
     } catch (error) {
       console.error('Error listing messages:', error);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+
+  @Put('conversation/:conversationId/read')
+  @ApiOperation({
+    summary: 'Mark all messages in a conversation as read',
+    description:
+      'Marks all unread messages in the specified conversation as read and resets the conversation unread count to 0.',
+  })
+  @ApiParam({
+    name: 'conversationId',
+    description: 'ID of the conversation to mark as read',
+    example: '507f1f77bcf86cd799439011',
+  })
+  @ApiOkResponse({
+    description: 'All messages marked as read successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        message: {
+          type: 'string',
+          example: 'All messages marked as read',
+        },
+        conversationId: {
+          type: 'string',
+          example: '507f1f77bcf86cd799439011',
+        },
+      },
+    },
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal server error',
+    schema: {
+      type: 'object',
+      properties: {
+        message: { type: 'string', example: 'Internal server error' },
+      },
+    },
+  })
+  async markAllMessagesAsRead(
+    @Res() res: Response,
+    @Param('conversationId') conversationId: string,
+  ) {
+    try {
+      await this.waMessagesService.markAllMessagesAsRead(conversationId);
+
+      return res.status(200).json({
+        message: 'All messages marked as read',
+        conversationId,
+      });
+    } catch (error) {
+      console.error('Error marking messages as read:', error);
       return res.status(500).json({ message: 'Internal server error' });
     }
   }

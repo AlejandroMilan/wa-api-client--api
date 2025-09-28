@@ -13,4 +13,5 @@ export interface IWaMessageRepository {
     page: number,
     limit: number,
   ): Promise<PaginatedMessages>;
+  markAllAsReadByConversationId(conversationId: string): Promise<void>;
 }

@@ -58,6 +58,13 @@ export class CreateMessageDto implements Partial<IWaMessage> {
   to?: string;
 
   @ApiPropertyOptional({
+    description: 'Whether the message has been read',
+    example: false,
+    default: false,
+  })
+  readed?: boolean;
+
+  @ApiPropertyOptional({
     description: 'Template configuration for template messages',
     type: 'object',
     properties: {

@@ -67,4 +67,12 @@ export class WaConversationsService {
       },
     };
   }
+
+  async incrementUnreadCount(conversationId: string): Promise<void> {
+    await this.waConversationRepository.incrementUnreadCount(conversationId);
+  }
+
+  async resetUnreadCount(conversationId: string): Promise<void> {
+    await this.waConversationRepository.resetUnreadCount(conversationId);
+  }
 }

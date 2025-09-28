@@ -33,6 +33,12 @@ export class MessageDto {
   })
   timestamp: Date;
 
+  @ApiProperty({
+    description: 'Whether the message has been read',
+    example: false,
+  })
+  readed: boolean;
+
   @ApiPropertyOptional({
     description: 'Text content of the message',
     example: 'Hello, how can I help you?',

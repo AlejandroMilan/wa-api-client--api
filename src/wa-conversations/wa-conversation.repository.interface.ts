@@ -10,4 +10,6 @@ export interface IWaConversationRepository {
   findByID(id: string): Promise<IWaConversation | null>;
   findByPhoneNumber(phoneNumber: string): Promise<IWaConversation | null>;
   findPaginated(page: number, limit: number): Promise<PaginatedConversations>;
+  incrementUnreadCount(conversationId: string): Promise<void>;
+  resetUnreadCount(conversationId: string): Promise<void>;
 }

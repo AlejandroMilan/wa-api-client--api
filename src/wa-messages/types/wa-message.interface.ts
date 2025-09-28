@@ -14,6 +14,7 @@ export interface IWaMessage {
   direction: WaMessageDirection;
   conversation: string;
   timestamp: Date;
+  readed: boolean;
   text?: string;
   template?: {
     templateName: string;

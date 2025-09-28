@@ -17,6 +17,8 @@ export class WaMessage implements IWaMessage {
   conversation: string;
   @Prop({ required: true })
   timestamp: Date;
+  @Prop({ required: true, default: false })
+  readed: boolean;
   @Prop()
   text: string;
 

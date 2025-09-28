@@ -63,10 +63,18 @@ export class WaMessagesService {
       message.conversation = conversation._id!.toString();
     }
 
-    return await this.waMessageRepository.save({
+    const savedMessage = await this.waMessageRepository.save({
       ...message,
       timestamp: new Date(),
+      readed: message.readed ?? false,
     });
+
+    // Increment unread count for incoming messages
+    if (message.direction === WaMessageDirection.INCOMING && !message.readed) {
+      await this.waConversationsService.incrementUnreadCount(conversation._id!);
+    }
+
+    return savedMessage;
   }
 
   async getLastMessageByConversationId(conversationId: string) {
@@ -100,5 +108,15 @@ export class WaMessagesService {
         hasPrev: page > 1,
       },
     };
+  }
+
+  async markAllMessagesAsRead(conversationId: string): Promise<void> {
+    // Mark all messages as read
+    await this.waMessageRepository.markAllAsReadByConversationId(
+      conversationId,
+    );
+
+    // Reset unread count in conversation
+    await this.waConversationsService.resetUnreadCount(conversationId);
   }
 }
