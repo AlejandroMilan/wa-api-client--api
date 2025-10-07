@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Inject,
   Param,
   Post,
   Put,
@@ -24,11 +25,17 @@ import { CreateMessageDto } from './dtos/create-message.dto';
 import { ListMessagesDto } from './dtos/list-messages.dto';
 import { ListMessagesResponseDto } from './dtos/list-messages-response.dto';
 import { WaMessagesService } from './wa-messages.service';
+import type { WaMessageInboundParser } from './wa-message-inbound-parser.interface';
+import { RegisterInboundMessageDto } from './dtos/inboud-messages.dto';
 
 @ApiTags('wa-messages')
 @Controller('wa-messages')
 export class WaMessagesController {
-  constructor(private readonly waMessagesService: WaMessagesService) {}
+  constructor(
+    private readonly waMessagesService: WaMessagesService,
+    @Inject('WaMessageInboundParser')
+    private waMessageInboundParser: WaMessageInboundParser,
+  ) {}
 
   @Post()
   @ApiOperation({
@@ -325,6 +332,32 @@ export class WaMessagesController {
       });
     } catch (error) {
       console.error('Error marking messages as read:', error);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+
+  @Post('inbound/register')
+  async registerInboundMessage(
+    @Res() res: Response,
+    @Body() registerInboundMessageDto: RegisterInboundMessageDto,
+  ) {
+    try {
+      const messages = await this.waMessageInboundParser.parse(
+        registerInboundMessageDto,
+      );
+
+      for (const message of messages) {
+        await this.waMessagesService.createNewMessage(
+          message as CreateMessageDto,
+        );
+      }
+
+      return res.status(201).json({
+        message: 'Inbound messages registered',
+        count: messages.length,
+      });
+    } catch (error) {
+      console.error('Error registering inbound message:', error);
       return res.status(500).json({ message: 'Internal server error' });
     }
   }

@@ -6,6 +6,7 @@ import { WaConversationsService } from 'src/wa-conversations/wa-conversations.se
 import { WaMessageMongoRepoProvider } from './mongo/wa-message.mongoRepository.provider';
 import { MongooseModule } from '@nestjs/mongoose';
 import { WaMessage, WaMessageSchema } from './mongo/wa-message.schema';
+import { InfobipInboundParserProvider } from 'src/infobip/infobip-parser-provider';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { WaMessage, WaMessageSchema } from './mongo/wa-message.schema';
     WaMessagesService,
     WaMessageMongoRepoProvider,
     WaConversationsService,
+    InfobipInboundParserProvider,
   ],
   exports: [WaMessagesService, WaMessageMongoRepoProvider],
 })
