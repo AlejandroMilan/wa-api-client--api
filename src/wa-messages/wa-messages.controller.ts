@@ -16,6 +16,7 @@ import {
   ApiCreatedResponse,
   ApiOkResponse,
   ApiNotFoundResponse,
+  ApiBadRequestResponse,
   ApiInternalServerErrorResponse,
   ApiParam,
   ApiQuery,
@@ -337,6 +338,66 @@ export class WaMessagesController {
   }
 
   @Post('inbound/register')
+  @ApiOperation({
+    summary: 'Register inbound messages from WhatsApp webhook',
+    description:
+      'Receives and processes inbound WhatsApp messages from webhook providers like Infobip. This endpoint parses the incoming webhook payload and creates new messages in the system.',
+  })
+  @ApiBody({
+    description: 'Inbound message webhook payload',
+    type: RegisterInboundMessageDto,
+  })
+  @ApiCreatedResponse({
+    description: 'Inbound messages processed successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        message: {
+          type: 'string',
+          example: 'Inbound messages registered',
+          description: 'Success message',
+        },
+        count: {
+          type: 'number',
+          example: 1,
+          description: 'Number of messages processed',
+        },
+      },
+    },
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid request payload or validation errors',
+    schema: {
+      type: 'object',
+      properties: {
+        message: {
+          type: 'string',
+          example: 'Validation failed',
+        },
+        statusCode: {
+          type: 'number',
+          example: 400,
+        },
+        error: {
+          type: 'array',
+          items: { type: 'string' },
+          example: [
+            'results must be an array',
+            'messageCount must be a number',
+          ],
+        },
+      },
+    },
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal server error during message processing',
+    schema: {
+      type: 'object',
+      properties: {
+        message: { type: 'string', example: 'Internal server error' },
+      },
+    },
+  })
   async registerInboundMessage(
     @Res() res: Response,
     @Body() registerInboundMessageDto: RegisterInboundMessageDto,

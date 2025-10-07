@@ -3,8 +3,8 @@ import { WaMessageType } from 'src/wa-messages/types/wa-message.interface';
 export interface InfobipInboundRequest {
   results: [
     {
-      from: number;
-      to: number;
+      from: string;
+      to: string;
       integrationType: string;
       receivedAt: string;
       messageId: string;
