@@ -65,6 +65,7 @@ export class MessagesWebSocketGateway implements OnGatewayConnection, OnGatewayD
 
   // Method to emit new message to conversation participants
   emitNewMessage(conversationId: string, message: any) {
+    this.logger.log(`Emitting new message to room: conversation-${conversationId}`, message);
     this.server.to(`conversation-${conversationId}`).emit('new-message', message);
     this.logger.log(`New message emitted to conversation ${conversationId}`);
   }
@@ -79,6 +80,7 @@ export class MessagesWebSocketGateway implements OnGatewayConnection, OnGatewayD
 
   // Method to emit conversation updates
   emitConversationUpdate(conversationId: string, conversation: any) {
+    this.logger.log(`Emitting conversation update for ${conversationId}`, conversation);
     this.server.emit('conversation-update', conversation);
     this.logger.log(`Conversation update emitted for ${conversationId}`);
   }
