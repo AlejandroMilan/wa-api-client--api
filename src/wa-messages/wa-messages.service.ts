@@ -11,6 +11,7 @@ import {
   WaConversationStatus,
 } from 'src/wa-conversations/types/wa-conversation.interface';
 import { WaSenderService } from 'src/wa-sender/wa-sender.service';
+import { MessagesWebSocketGateway } from 'src/websocket/websocket.gateway';
 
 @Injectable()
 export class WaMessagesService {
@@ -19,6 +20,7 @@ export class WaMessagesService {
     private waMessageRepository: IWaMessageRepository,
     private readonly waConversationsService: WaConversationsService,
     private readonly waSenderService: WaSenderService,
+    private readonly webSocketGateway: MessagesWebSocketGateway,
   ) {}
 
   async createNewMessage(message: CreateMessageDto) {
@@ -86,6 +88,23 @@ export class WaMessagesService {
       );
     }
 
+    // Emit real-time message to conversation participants
+    this.webSocketGateway.emitNewMessage(
+      conversation._id!.toString(),
+      savedMessage,
+    );
+
+    // Emit conversation update for sidebar refresh
+    const updatedConversation = await this.waConversationsService.getConversationById(
+      conversation._id!.toString(),
+    );
+    if (updatedConversation) {
+      this.webSocketGateway.emitConversationUpdate(
+        conversation._id!.toString(),
+        updatedConversation,
+      );
+    }
+
     return savedMessage;
   }
 
@@ -130,5 +149,23 @@ export class WaMessagesService {
 
     // Reset unread count in conversation
     await this.waConversationsService.resetUnreadCount(conversationId);
+
+    // Emit message status update to conversation participants
+    this.webSocketGateway.emitMessageStatusUpdate(
+      conversationId,
+      'all',
+      'read',
+    );
+
+    // Emit conversation update for sidebar refresh
+    const updatedConversation = await this.waConversationsService.getConversationById(
+      conversationId,
+    );
+    if (updatedConversation) {
+      this.webSocketGateway.emitConversationUpdate(
+        conversationId,
+        updatedConversation,
+      );
+    }
   }
 }

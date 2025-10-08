@@ -9,6 +9,7 @@ import { WaMessage, WaMessageSchema } from './mongo/wa-message.schema';
 import { InfobipInboundParserProvider } from 'src/infobip/infobip-parser-provider';
 import { WaSenderModule } from 'src/wa-sender/wa-sender.module';
 import { WaSenderService } from 'src/wa-sender/wa-sender.service';
+import { WebSocketModule } from 'src/websocket/websocket.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { WaSenderService } from 'src/wa-sender/wa-sender.service';
     ]),
     WaConversationsModule,
     WaSenderModule,
+    WebSocketModule,
   ],
   controllers: [WaMessagesController],
   providers: [
