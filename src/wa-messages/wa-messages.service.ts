@@ -10,6 +10,7 @@ import {
   IWaConversation,
   WaConversationStatus,
 } from 'src/wa-conversations/types/wa-conversation.interface';
+import { WaSenderService } from 'src/wa-sender/wa-sender.service';
 
 @Injectable()
 export class WaMessagesService {
@@ -17,6 +18,7 @@ export class WaMessagesService {
     @Inject('IWaMessageRepository')
     private waMessageRepository: IWaMessageRepository,
     private readonly waConversationsService: WaConversationsService,
+    private readonly waSenderService: WaSenderService,
   ) {}
 
   async createNewMessage(message: CreateMessageDto) {
@@ -72,6 +74,16 @@ export class WaMessagesService {
     // Increment unread count for incoming messages
     if (message.direction === WaMessageDirection.INCOMING && !message.readed) {
       await this.waConversationsService.incrementUnreadCount(conversation._id!);
+    }
+
+    if (
+      message.type === WaMessageType.TEXT &&
+      message.direction === WaMessageDirection.OUTGOING
+    ) {
+      await this.waSenderService.sendTextMessage(
+        message.text,
+        conversation.phoneNumber,
+      );
     }
 
     return savedMessage;

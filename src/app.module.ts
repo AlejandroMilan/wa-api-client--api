@@ -5,6 +5,7 @@ import { WaConversationsModule } from './wa-conversations/wa-conversations.modul
 import { WaMessagesModule } from './wa-messages/wa-messages.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { WaSenderModule } from './wa-sender/wa-sender.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { MongooseModule } from '@nestjs/mongoose';
     }),
     WaConversationsModule,
     WaMessagesModule,
+    WaSenderModule,
   ],
   controllers: [AppController],
   providers: [AppService],

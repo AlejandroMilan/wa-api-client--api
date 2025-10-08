@@ -7,6 +7,8 @@ import { WaMessageMongoRepoProvider } from './mongo/wa-message.mongoRepository.p
 import { MongooseModule } from '@nestjs/mongoose';
 import { WaMessage, WaMessageSchema } from './mongo/wa-message.schema';
 import { InfobipInboundParserProvider } from 'src/infobip/infobip-parser-provider';
+import { WaSenderModule } from 'src/wa-sender/wa-sender.module';
+import { WaSenderService } from 'src/wa-sender/wa-sender.service';
 
 @Module({
   imports: [
@@ -14,6 +16,7 @@ import { InfobipInboundParserProvider } from 'src/infobip/infobip-parser-provide
       { name: WaMessage.name, schema: WaMessageSchema },
     ]),
     WaConversationsModule,
+    WaSenderModule,
   ],
   controllers: [WaMessagesController],
   providers: [
@@ -21,6 +24,7 @@ import { InfobipInboundParserProvider } from 'src/infobip/infobip-parser-provide
     WaMessageMongoRepoProvider,
     WaConversationsService,
     InfobipInboundParserProvider,
+    WaSenderService,
   ],
   exports: [WaMessagesService, WaMessageMongoRepoProvider],
 })
