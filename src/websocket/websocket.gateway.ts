@@ -16,7 +16,9 @@ import { Logger } from '@nestjs/common';
     credentials: true,
   },
 })
-export class MessagesWebSocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class MessagesWebSocketGateway
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer()
   server: Server;
 
@@ -39,7 +41,9 @@ export class MessagesWebSocketGateway implements OnGatewayConnection, OnGatewayD
     @ConnectedSocket() client: Socket,
   ) {
     client.join(`conversation-${data.conversationId}`);
-    this.logger.log(`Client ${client.id} joined conversation ${data.conversationId}`);
+    this.logger.log(
+      `Client ${client.id} joined conversation ${data.conversationId}`,
+    );
   }
 
   @SubscribeMessage('leave-conversation')
@@ -48,12 +52,15 @@ export class MessagesWebSocketGateway implements OnGatewayConnection, OnGatewayD
     @ConnectedSocket() client: Socket,
   ) {
     client.leave(`conversation-${data.conversationId}`);
-    this.logger.log(`Client ${client.id} left conversation ${data.conversationId}`);
+    this.logger.log(
+      `Client ${client.id} left conversation ${data.conversationId}`,
+    );
   }
 
   @SubscribeMessage('typing')
   handleTyping(
-    @MessageBody() data: { conversationId: string; isTyping: boolean; userName?: string },
+    @MessageBody()
+    data: { conversationId: string; isTyping: boolean; userName?: string },
     @ConnectedSocket() client: Socket,
   ) {
     client.to(`conversation-${data.conversationId}`).emit('user-typing', {
@@ -65,22 +72,36 @@ export class MessagesWebSocketGateway implements OnGatewayConnection, OnGatewayD
 
   // Method to emit new message to conversation participants
   emitNewMessage(conversationId: string, message: any) {
-    this.logger.log(`Emitting new message to room: conversation-${conversationId}`, message);
-    this.server.to(`conversation-${conversationId}`).emit('new-message', message);
+    this.logger.log(
+      `Emitting new message to room: conversation-${conversationId}`,
+      message,
+    );
+    this.server
+      .to(`conversation-${conversationId}`)
+      .emit('new-message', message);
     this.logger.log(`New message emitted to conversation ${conversationId}`);
   }
 
   // Method to emit message status updates
-  emitMessageStatusUpdate(conversationId: string, messageId: string, status: string) {
-    this.server.to(`conversation-${conversationId}`).emit('message-status-update', {
-      messageId,
-      status,
-    });
+  emitMessageStatusUpdate(
+    conversationId: string,
+    messageId: string,
+    status: string,
+  ) {
+    this.server
+      .to(`conversation-${conversationId}`)
+      .emit('message-status-update', {
+        messageId,
+        status,
+      });
   }
 
   // Method to emit conversation updates
   emitConversationUpdate(conversationId: string, conversation: any) {
-    this.logger.log(`Emitting conversation update for ${conversationId}`, conversation);
+    this.logger.log(
+      `Emitting conversation update for ${conversationId}`,
+      conversation,
+    );
     this.server.emit('conversation-update', conversation);
     this.logger.log(`Conversation update emitted for ${conversationId}`);
   }
